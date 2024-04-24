@@ -1,6 +1,6 @@
 from math import gcd
 import random
-
+from time import process_time
 
 
 def is_prime(p):
@@ -59,7 +59,7 @@ def decryption(a,p,c_1,c_2):
 
 
 def main():
-
+    t_1 = process_time()
 
     #Large prime p
     p = int(input("p: "))
@@ -104,7 +104,9 @@ def main():
 
     print(f"Decrypted: {m}")
 
-
+    t_2 = process_time()
+    print("Elapsed time", t_2-t_1, "sec")
+    
 
 if __name__ == "__main__":
     main()
