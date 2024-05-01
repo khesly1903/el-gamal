@@ -114,22 +114,31 @@ def decryption(ec,q,n,C_1,C_2):
 
 
 def main():
-    ec = -7,10
-    q = 13
-    P = (11,4)
+    a = int(input("a: "))
+    b = int(input("b: "))
+    ec = (a,b)
+    q = int(input("q: "))
+
+    x_0 , y_0 = input("P: ").split()
+    x_0 = int(x_0)
+    y_0 = int(y_0)
+    P = x_0 , y_0
 
 
-    n = 4
+    n = int(input("secret n: ")) % q
 
     Q =  s_mult(ec,q,n,P)
 
-    M = 11,4
+    x_1 , y_1 = input("M(point): ").split()
+    x_1 = int(x_1)
+    y_1 = int(y_1)
+    M = x_1 , y_1
 
 
 
     c_1,c_2 = encyption(ec,q,M,P,Q)
     print(f"Encrypted pair: {c_1},{c_2}")
-    print(decryption((-7,10),13,4,c_1,c_2))
+    print(decryption(ec,q,n,c_1,c_2))
     
 
     
