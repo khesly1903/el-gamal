@@ -9,9 +9,6 @@ def ec_dis(a,b):
         raise ValueError("Discriminant is 0")
      
 
-def ec_point():
-    pass
-
 def inv(a,q):
     if a == q:
         raise ValueError("not invertible")
@@ -76,23 +73,6 @@ def s_mult(ec,q, k, P):
         R = addition(ec, q, P, R)
         
     return R
-
-def order(ec,q,P):
-    print(f"ORDER OF {P}")
-    R = P
-    order_of_point = 1
-    while True:
-        R = addition(ec, q, P, R)
-        order_of_point += 1
-        if R == O:
-            break
-    return order_of_point
-
-
-def hasse_bound(q):
-    hasse_lower = (-2)*math.sqrt(q)+q+1
-    hasse_upper = 2*math.sqrt(q)+q+1
-    print(f"Hasse bound for {q} is {hasse_lower} <= #E <= {hasse_upper}")
 
 
 def encyption(ec,q,M,P,Q):
