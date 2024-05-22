@@ -128,34 +128,32 @@ def binary(k):
 
     return binary_arr
         
-
-def double(ec,q,P):
-    return addition(ec,q,P,P)
-
 def double_and_add(ec,q,k,P):
     n = 1
     R = P
 
     
     binary_k = binary(k)[1:] #no operation for first bit
-
+    
 
     for bit in binary_k:
         if bit == 0:
             n *= 2
+            R = addition(ec,q,R,R) #double
+            
 
             
         elif bit == 1:
             n = n*2 
-            R = double(ec,q,R) #double
+            R = addition(ec,q,R,R) #double
             R = addition(ec,q,P,R) #add
             n += 1
+
 
         else:
             raise(ValueError)
 
     return R
-
 def hasse_bound(q):
     hasse_lower = math.floor((-2)*math.sqrt(q)+q+1)
     hasse_upper = math.floor(2*math.sqrt(q)+q+1)
