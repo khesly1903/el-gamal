@@ -1,124 +1,114 @@
 import numpy as np
-import math
 import random
-O = (np.inf,np.inf)
+import ec_overF_lib as ecf
 
-def ec_dis(a,b):
-    discriminant = pow(4*a,3) + 27 * pow(b,2)
-    if discriminant == 0:
-        raise ValueError("Discriminant is 0")
-     
-
-def inv(a,q):
-    if a == q:
-        raise ValueError("not invertible")
-    elif a > q:
-        a %= q
-        return pow(a,-1,q)
-    elif a < q:
-        return pow(a,-1,q)
-    else:
-        raise ValueError("??nasi")
+def center_text(message, width=80):
+    lines = message.strip().split('\n')
+    centered_lines = [line.center(width) for line in lines]    
+    centered_message = '\n'.join(centered_lines)
     
+    return centered_message
 
-def is_on_curve(ec,q,P):
-    a,b = ec
-    x,y = P
-    if pow(y,2,q) == pow(x,3,q) + a*x + b:
-        pass
-    else:
-        raise ValueError
-
-def negative(P):
-    x_1,x_2 = P
-    return x_1,-x_2
-
-def addition(ec,q,P,Q):
-
-    x_1,y_1 = P
-    x_2,y_2 = Q
-
-    a,b = ec
+def encyption(ec,q,k,M,P,Q):
     
-    if x_1 == np.inf and y_1 == np.inf: # O + P = P
-        x_3,y_3 = x_2,y_2 
-
-    elif x_2 == np.inf and y_2 == np.inf: # P + O = P
-        x_3,y_3 = x_1,y_1
+    C_1 = ecf.double_and_add(ec,q,k,P)
+    C_2 = ecf.addition(ec,q,M,ecf.double_and_add(ec,q,k,Q))
     
-    elif (x_1 != x_2 and y_1 != y_2) or (x_1 != x_2 and y_1 == y_2): #point addition
-        drv = ((y_2 - y_1) * inv(x_2-x_1,q)) %q
-        x_3 = (pow(drv,2) - x_1 - x_2) %q
-        y_3 = (drv * (x_1 - x_3) - y_1) %q
-
-    elif x_1 == x_2 and y_1 == y_2: #point doubling
-        drv = ((3*pow(x_1,2)+a)*(pow(2*y_1,-1,q))) %q
-        x_3 = (pow(drv,2) - x_1 - x_2) %q
-        y_3 = (drv * (x_1 - x_3) - y_1) %q
-
-    elif x_1 == x_2 and (y_1 + y_2)%q == 0: #point negation
-        x_3,y_3 = O
-
-    
-
-    
-    R = x_3,y_3
-
-    return R
-
-
-def s_mult(ec,q, k, P): 
-    R = P
-    for i in range(1, k):
-        R = addition(ec, q, P, R)
-        
-    return R
-
-
-def encyption(ec,q,M,P,Q):
-    k = random.randint(1, q - 1)
-    print(f"random k = {k}")
-    
-    C_1 = s_mult(ec,q,k,P)
-
-    C_2 = addition(ec,q,M,s_mult(ec,q,k,Q))
-
-
-
     return C_1,C_2
     
    
 
 def decryption(ec,q,n,C_1,C_2):
-    return addition(ec,q,C_2,negative(s_mult(ec,q,n,C_1)))
+    return ecf.addition(ec,q,C_2,ecf.negative(ecf.double_and_add(ec,q,n,C_1)))
 
 
 def main():
+    
+    print(center_text("""
+Decide a large prime q, 
+an elliptic curve E over F_p
+and a point P in E(F_p)
+          """))
+    
+    q = int(input("q: "))
+    
+    print(center_text("""
+To construct an elliptic curve over a finite field, 
+please provide the parameters a and b for the equation 
+y^2 = x^3 + ax + b
+          """))
     a = int(input("a: "))
     b = int(input("b: "))
     ec = (a,b)
-    q = int(input("q: "))
+
+    
+    # a = 12
+    # b = 45
+    # ec = (a,b)
+    # q = 983
+    
+        
+    print(center_text("""
+Give a point in E(F_p)
+          """))
+
 
     x_0 , y_0 = input("P: ").split()
     x_0 = int(x_0)
     y_0 = int(y_0)
     P = x_0 , y_0
+    
+    ecf.is_on_curve(ec,q,P)
+
+    print(center_text(("""
+Alice chooses a secret n in Z
+          """)))
+
+    n = int(input("n: ")) 
+
+    Q =  ecf.double_and_add(ec,q,n,P)
+    
+    print(center_text((f"""
+Alice computes the point:
+n x P = Q  
+{n} x {P} = {Q} 
+and sends to Bob as public key
+          """)))
 
 
-    n = int(input("secret n: ")) % q
-
-    Q =  s_mult(ec,q,n,P)
-
-    x_1 , y_1 = input("M(point): ").split()
+    print(center_text(("""
+Bob chooses plaintext M in E(F_p)
+          """)))
+    x_1 , y_1 = input("M: ").split()
     x_1 = int(x_1)
     y_1 = int(y_1)
     M = x_1 , y_1
 
+    ecf.is_on_curve(ec,q,M)
+    
+    k = random.randint(1, q - 1)
+        
+    print(center_text((f"""
+Bob chooses a random key k = {k} in Z
+          """)))
+    c_1,c_2 = encyption(ec,q,k,M,P,Q)
+    
+    print(center_text((f"""
+Bob uses Alice's public key Q to compute
+C_1 = k x P
+{c_1} = {k} x {P}
 
+C_2 = M + kQ
+{c_2} = {M} + {k}{Q}
+          """)))
 
-    c_1,c_2 = encyption(ec,q,M,P,Q)
-    print(f"Encrypted pair: {c_1},{c_2}")
-    print(decryption(ec,q,n,c_1,c_2))
+    M = decryption(ec,q,n,c_1,c_2)
+    print(center_text(f"""
+Alice computes the message M:
+M = C_2 - nC_1
+{M} = {c_2} - {n}{c_1}
+          """))
+
     
 
     
