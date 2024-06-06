@@ -31,7 +31,7 @@ def inv(a,q):
     elif a < q:
         return pow(a,-1,q)
     else:
-        raise ValueError("??nasi")
+        raise ValueError(f"{a} has no inverse mod{q}")
     
 
 def is_on_curve(ec,q,P):
